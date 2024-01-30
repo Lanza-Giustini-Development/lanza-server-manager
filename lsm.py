@@ -1,5 +1,12 @@
 import discord  # added this
 from discord.ext import commands
+import os
+from dotenv import load_dotenv
+
+load_dotenv('./.env')
+
+TOKEN = os.getenv('DISCORD_TOKEN')
+WHITELIST = os.getenv('WHITELIST').split(",")
 
 prefix = "/"
 intents = discord.Intents.all()  # added this
@@ -8,12 +15,13 @@ bot = commands.Bot(command_prefix=prefix, intents=intents)  # modified this
 
 @bot.event
 async def on_ready():
-    print("Everything's all ready to go~")
+    print("LSM is online and ready to recieve commands")
 
 
 @bot.event
 async def on_message(message):
-    print("The message's content was", message.content)
+    print("The message's author was", message.author)
+    print(str(message.author) in WHITELIST)
     await bot.process_commands(message)
 
 
@@ -35,4 +43,4 @@ async def ping(ctx):
 async def echo(ctx, *, content:str):
     await ctx.send(content)
 
-bot.run("")  # Where 'TOKEN' is your bot token
+bot.run(TOKEN)  # Where 'TOKEN' is your bot token
