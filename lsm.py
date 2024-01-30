@@ -1,10 +1,13 @@
 import discord
 from discord.ext import commands
 import os
-import subprocess
+import requests
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 WHITELIST = os.getenv('WHITELIST').split(",")
+
+palworld_startup_url = "http://127.0.0.1:5000/palworld/startup"
+palworld_shutdown_url = "http://127.0.0.1:5000/palworld/shutdown"
 
 prefix = "/"
 intents = discord.Intents.all()
@@ -37,31 +40,29 @@ async def ping(ctx):
 async def echo(ctx, *, content:str):
     await ctx.send(content)
 
+#stop palworld server
 @bot.command()
 async def palworld_shutdown(ctx):
-    try:
-        result = subprocess.run(
-            ["docker", "compose", "down"], 
-            cwd=pal_dir, 
-            check=True, 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE,
-            text=True
-        )
-        print("debug")
-        print("Output:", result.stdout)
-        print("Error:", result.stderr)
-    except subprocess.CalledProcessError as e:
-        print("Failed to run docker-compose down:", e)
+    print("palworld startup requested")
+    ret = requests.post(palworld_shutdown_url)
+    if (ret.status_code == 200):
+        msg = "Palworld shutdown succeeded"
+        await ctx.send(msg)
+    else:
+        msg = "Palworld shutdown failed"
+        await ctx.send(msg)
 
+#start palworld server
 @bot.command()
 async def palworld_startup(ctx):
-    try:
-        pal_dir = '/docker-compose-palworld'
-        subprocess.run(["docker","compose","up", "-d"], cwd=pal_dir,check=True)
-        await ctx.send("Starting up The Palworld Server")
-    except subprocess.CalledProcessError as e:
-        await ctx.send(f"Failed to Startup Palworld Server: {e}")
+    print("palworld startup requested")
+    ret = requests.post(palworld_startup_url)
+    if (ret.status_code == 200):
+        msg = "Palworld startup succeeded"
+        await ctx.send(msg)
+    else:
+        msg = "Palworld startup failed"
+        await ctx.send(msg)
 
 #run the bot
 bot.run(TOKEN)
