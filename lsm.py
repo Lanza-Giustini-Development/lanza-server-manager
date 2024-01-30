@@ -5,9 +5,10 @@ import requests
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 WHITELIST = os.getenv('WHITELIST').split(",")
+base_url= "http://localhost:5000/"
+palworld_startup_url =  base_url + "/palworld/startup"
+palworld_shutdown_url = base_url + "/palworld/shutdown"
 
-palworld_startup_url = "http://127.0.0.1:5000/palworld/startup"
-palworld_shutdown_url = "http://127.0.0.1:5000/palworld/shutdown"
 
 prefix = "/"
 intents = discord.Intents.all()
@@ -62,6 +63,16 @@ async def palworld_startup(ctx):
         await ctx.send(msg)
     else:
         msg = "Palworld startup failed"
+        await ctx.send(msg)
+
+@bot.command()
+async def test_flask(ctx):
+    ret = requests.get(base_url)
+    if (ret.status_code == 200):
+        msg = "Flask Service Alive"
+        await ctx.send(msg)
+    else:
+        msg = "No Flask Service Avaliable"
         await ctx.send(msg)
 
 #run the bot
