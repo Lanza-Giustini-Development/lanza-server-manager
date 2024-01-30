@@ -1,7 +1,7 @@
 import discord  # added this
 from discord.ext import commands
 
-prefix = "?"
+prefix = "/"
 intents = discord.Intents.all()  # added this
 bot = commands.Bot(command_prefix=prefix, intents=intents)  # modified this
 
